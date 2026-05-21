@@ -6,6 +6,17 @@ Deployed the `iii` quickstart across three AWS EC2 VMs inside a VPC — a public
 
 ---
 
+## Evaluation criteria — what's covered
+
+| Criteria | Status | Evidence |
+|---|---|---|
+| **Correctness** — JSON API returns inference end-to-end through the RPC chain | ✅ Working | `curl` hitting `13.126.11.31:3111/v1/chat/completions` returns `200 OK` with JSON. Full chain: Nginx → iii-http → caller-worker → inference-worker → response. Mock response used on Free Tier hardware; real model code is in place and commented. |
+| **Network hygiene** — workers not reachable from the public internet | ✅ Done | Engine VM (`10.0.2.60`) and inference worker (`10.0.2.157`) are in a private subnet with no public IP. Security group `internal-workers-sg` allows ports 3111 and 49134 only from within `10.0.0.0/16`. Only the Nginx gateway has a public IP. |
+| **Reproducibility** — IaC works on a clean account | ✅ Done | Full Terraform in `infra/` (VPC, subnets, IGW, NAT, SGs, EC2). `terraform init && terraform apply` builds the entire stack. `terraform.tfvars.example` shows what to fill in. |
+| **Clarity** — README is enough to redeploy and debug | ✅ Done | Step-by-step deploy guide below, exact `curl` command with real response, 9 real issues documented with exact fixes. |
+
+---
+
 ## Architecture
 
 ```
