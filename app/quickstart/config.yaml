@@ -1,5 +1,12 @@
 # iii engine configuration
 # Docs: https://iii.dev/docs/how-to/configure-engine
+#
+# DEPLOYMENT NOTE:
+#   - iii-http is bound to 0.0.0.0:3111 so Nginx in the public subnet can proxy to it.
+#   - inference-worker is intentionally NOT listed here; it runs on a separate VM
+#     (inference_worker VM) and connects to the engine via III_URL=ws://<engine-ip>:49134.
+#   - caller-worker runs on this same engine VM, managed by iii-worker.
+
 workers:
   - name: iii-observability
     config:
@@ -18,6 +25,7 @@ workers:
     config:
       adapter:
         name: builtin
+
   - name: iii-state
     config:
       adapter:
@@ -25,10 +33,11 @@ workers:
         config:
           store_method: file_based
           file_path: ./data/state_store.db
+
   - name: iii-http
     config:
       port: 3111
-      host: 127.0.0.1
+      host: 0.0.0.0        # Changed from 127.0.0.1 — must be 0.0.0.0 for Nginx cross-VM proxy
       default_timeout: 30000
       concurrency_request_limit: 1024
       cors:
@@ -40,7 +49,6 @@ workers:
         - PUT
         - DELETE
         - OPTIONS
-  - name: inference-worker
-    worker_path: /Users/anuran/Alchemyst/hiring/may-2026/devops/quickstart/workers/inference-worker
+
   - name: caller-worker
-    worker_path: /Users/anuran/Alchemyst/hiring/may-2026/devops/quickstart/workers/caller-worker
+    worker_path: ./workers/caller-worker

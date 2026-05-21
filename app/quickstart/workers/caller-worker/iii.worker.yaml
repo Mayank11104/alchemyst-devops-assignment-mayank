@@ -5,4 +5,4 @@ runtime:
   entry: src/worker.ts
 scripts:
   install: 'npm install'
-  start: 'npm run dev'
+  start: 'npx tsx src/worker.ts'   # prod: removed 'watch' flag from tsx

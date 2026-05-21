@@ -5,7 +5,7 @@ runtime:
   entry: inference_worker.py
 scripts:
   install: "pip install -r requirements.txt"
-  start: "watchfiles 'python inference_worker.py'"
+  start: "python inference_worker.py"   # prod: removed watchfiles watcher
 resources:
-  memory: 8192   # MiB — bumped from 2048 default
-  cpus: 4        # vCPUs — bumped from 2 default
+  memory: 8192   # MiB — requires t3.xlarge (16 GB) in production
+  cpus: 4        # vCPUs — requires t3.xlarge in production
