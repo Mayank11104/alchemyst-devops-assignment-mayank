@@ -19,37 +19,8 @@ Deployed the `iii` quickstart across three AWS EC2 VMs inside a VPC — a public
 
 ## Architecture
 
-```
-                          ┌─────────────────────────────────────────────────────┐
-                          │                  AWS VPC 10.0.0.0/16                │
-                          │                                                     │
-  Your curl request       │  Public Subnet 10.0.1.0/24                         │
-──────────────────────►  │  ┌─────────────────────────┐                       │
-  POST :3111              │  │  api-gateway (t3.micro)  │                       │
-                          │  │  13.126.11.31            │                       │
-                          │  │  Nginx → :3111           │                       │
-                          │  └───────────┬─────────────┘                       │
-                          │              │ proxy_pass :3111                     │
-                          │              ▼                                      │
-                          │  Private Subnet 10.0.2.0/24                        │
-                          │  ┌─────────────────────────┐                       │
-                          │  │  engine (t3.micro)       │                       │
-                          │  │  10.0.2.60               │                       │
-                          │  │  iii engine  :3111       │                       │
-                          │  │  caller-worker (tsx)     │                       │
-                          │  └───────────┬─────────────┘                       │
-                          │              │ WebSocket :49134 (RPC)              │
-                          │              ▼                                      │
-                          │  ┌─────────────────────────┐                       │
-                          │  │  inference-worker        │                       │
-                          │  │  (t3.micro)              │                       │
-                          │  │  10.0.2.157              │                       │
-                          │  │  Python worker           │                       │
-                          │  └─────────────────────────┘                       │
-                          │                            ▲                        │
-                          │          NAT Gateway ──────┘ (outbound only)       │
-                          └─────────────────────────────────────────────────────┘
-```
+![AWS Architecture Diagram](./architecture.png)
+
 
 **RPC call chain for a single request:**
 
